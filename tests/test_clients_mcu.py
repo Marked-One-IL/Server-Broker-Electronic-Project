@@ -3,57 +3,61 @@ import socket
 import struct
 import time
 import threading
+import random
 
 def client_thread(client_id):
-    """Client that shows exactly what's happening"""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
-    try:
-        sock.connect(('127.0.0.1', 4601))
-        print(f"[Client {client_id}] Connected")
-        
-        packet_count = 0
-        unique_data = set()
-        last_print_time = time.time()
-        
-        while True:
-            # Receive without delay to see actual data rate
-            data = sock.recv(12)
-            if len(data) == 12:
-                packet_count += 1
+    """Client that connects, receives one packet every ~3 secs, then disconnects randomly"""
+    while True:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            sock.connect(('127.0.0.1', 4601))
+            print(f"[Client {client_id}] Connected")
+
+            while True:
+                data = sock.recv(12)
+                if len(data) != 12:
+                    break
+
                 temperature, moisture, soil_moisture = struct.unpack('!fff', data)
-                current_data = (temperature, moisture, soil_moisture)
-                unique_data.add(current_data)
-                
-                # Print every second to avoid spam
-                current_time = time.time()
-                if current_time - last_print_time >= 3.0:
-                    print(f"[Client {client_id}] Packets: {packet_count} | "
-                          f"Unique: {len(unique_data)} | "
-                          f"Current: Temp={temperature:.2f}, Moisture={moisture:.2f}, Soil={soil_moisture:.2f}")
-                    last_print_time = current_time
-                    packet_count = 0
-                    unique_data.clear()
-                
-    except Exception as e:
-        print(f"[Client {client_id}] Error: {e}")
-    finally:
-        sock.close()
+                print(f"[Client {client_id}] Temp={temperature:.2f}, Moisture={moisture:.2f}, Soil={soil_moisture:.2f}")
+
+                # Wait ~3 seconds before next packet
+                time.sleep(3)
+
+                # Randomly decide to disconnect
+                if random.random() < 0.1:  # ~10% chance each iteration
+                    print(f"[Client {client_id}] Disconnecting randomly")
+                    break
+
+        except Exception as e:
+            print(f"[Client {client_id}] Error: {e}")
+        finally:
+            sock.close()
+            # Wait a short random time before reconnecting
+            time.sleep(random.uniform(1, 5))
 
 def main():
     print("=== Debug Client Test ===")
-    print("This will show how many packets you're actually receiving")
-    print("Press Ctrl+C to stop\n")
-    
-    client = threading.Thread(target=client_thread, args=(1,))
-    client.daemon = True
-    client.start()
-    
+    print("Random infinite clients connecting/disconnecting\n")
+
+    client_id_counter = 1
+    threads = []
+
     try:
         while True:
+            # Randomly spawn a new client thread
+            if random.random() < 0.3:  # ~30% chance per loop iteration
+                t = threading.Thread(target=client_thread, args=(client_id_counter,))
+                t.daemon = True
+                t.start()
+                threads.append(t)
+                client_id_counter += 1
+
             time.sleep(1)
+
     except KeyboardInterrupt:
-        print("\n[!] Stopping...")
+        print("\n[!] Stopping all clients...")
 
 if __name__ == "__main__":
     main()
+    input()

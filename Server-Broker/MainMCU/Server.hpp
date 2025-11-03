@@ -1,6 +1,5 @@
 #pragma once
 #include "../General/SensorsData.hpp"
-
 #include <WinSock2.h>
 #include <Windows.h>
 #include <atomic>
@@ -23,11 +22,11 @@ namespace MainMCU
         void handle(void);
         void setSensorsData(const General::SensorsData& sensorsData);
 
+        std::thread m_mainThread;
         std::mutex m_getSensorsDataMutex;
-        General::SensorsData m_sensorsData;
-
         std::atomic<bool> m_keepRunning = true;
         SOCKET m_mainSocket = INVALID_SOCKET;
         SOCKET m_clientSocket = INVALID_SOCKET;
+        General::SensorsData m_sensorsData;
     };
 }

@@ -1,7 +1,6 @@
 #include "../ClientMCU/Server.hpp"
 #include "../General/Connection.hpp"
 #include "../General/ThreadSafeCout.hpp"
-
 #include <algorithm>
 
 ClientMCU::Server::Server(unsigned short port)
@@ -12,8 +11,8 @@ ClientMCU::Server::Server(unsigned short port)
         this->m_mainSocket = General::Connection::createSocket();
         General::Connection::doBind(this->m_mainSocket, port);
         General::Connection::doListen(this->m_mainSocket);
-        std::thread acceptThread(&ClientMCU::Server::acceptClients, this);
-        acceptThread.detach();
+        this->m_mainThread = std::thread(&ClientMCU::Server::acceptClients, this);
+        this->m_freeingThread = std::thread(&ClientMCU::Server::freeFinishedThreads, this);
     }
     catch (const std::exception& error)
     {
@@ -39,10 +38,19 @@ void ClientMCU::Server::stop(void)
 {
     this->m_keepRunning = false;
 
+    // I make sure first all sub threads are closed.
     General::Connection::closeSocket(this->m_mainSocket);
+    if (this->m_mainThread.joinable()) this->m_mainThread.join();
+    if (this->m_freeingThread.joinable()) this->m_freeingThread.join();
+
+    // Then I free to touch clients vector as I wish.
     for (auto& client : this->m_clients)
     {
-        General::Connection::closeSocket(client);
+        auto& socket = client.first;
+        auto& thread = client.second;
+
+        General::Connection::closeSocket(socket);
+        if (thread.joinable()) thread.join();
     }
 }
 
@@ -65,6 +73,11 @@ void ClientMCU::Server::acceptClients(void)
         }
     }
 }
+void ClientMCU::Server::addClient(SOCKET clientSocket)
+{
+    std::lock_guard<std::mutex> lock(this->m_clientsMutex);
+    this->m_clients.emplace_back(clientSocket, std::thread(&ClientMCU::Server::handle, this, clientSocket));
+}
 void ClientMCU::Server::handle(SOCKET socket)
 {
     try
@@ -85,30 +98,22 @@ void ClientMCU::Server::handle(SOCKET socket)
         // If server is closing some methods from General::Connection may and probably will throw.
         if (this->m_keepRunning)
         {
-            this->removeClient(socket);
             LOG_WARNING(error.what());
         }
     }
 }
-void ClientMCU::Server::addClient(SOCKET clientSocket)
+void ClientMCU::Server::freeFinishedThreads(void)
 {
-    std::lock_guard<std::mutex> lock(this->m_clientsMutex);
-    if (not this->m_keepRunning) return; // The server could close but a thread can still slip in.
-
-    std::thread clientThread(&ClientMCU::Server::handle, this, clientSocket);
-    clientThread.detach();
-    this->m_clients.emplace_back(clientSocket);
-}
-void ClientMCU::Server::removeClient(SOCKET clientSocket)
-{
-    std::lock_guard<std::mutex> lock(this->m_clientsMutex);
-    if (not this->m_keepRunning) return; // The server could close but a thread can still slip in.
-
-    auto it = std::find(this->m_clients.begin(), this->m_clients.end(), clientSocket);
-    if (it == this->m_clients.end()) return;
-
-    General::Connection::closeSocket(*it);
-    this->m_clients.erase(it);
+    while (this->m_keepRunning)
+    {
+        // The lock must be here and not at the start because other functions will get into starvation mode.
+        std::lock_guard<std::mutex> lock(this->m_clientsMutex);
+        for (auto it = this->m_clients.begin(); it != this->m_clients.end();)
+        {
+            if (!it->second.joinable()) it = this->m_clients.erase(it);
+            else ++it;
+        }
+    }
 }
 General::SensorsData ClientMCU::Server::getSensorsData(void)
 {

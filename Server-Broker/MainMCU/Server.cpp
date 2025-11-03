@@ -2,7 +2,6 @@
 #include "../General/ThreadSafeCout.hpp"
 #include "../General/Connection.hpp"
 #include <stdexcept>
-#include "Server.hpp"
 
 MainMCU::Server::Server(unsigned short port)
 {
@@ -16,8 +15,7 @@ MainMCU::Server::Server(unsigned short port)
         // I gotta make sure I accept the MainMCU before going to the clients.
         // That's why it's not in the handle() thread.
         this->m_clientSocket = General::Connection::doAccept(this->m_mainSocket);
-        std::thread handleThread(&MainMCU::Server::handle, this);
-        handleThread.detach();
+        this->m_mainThread = std::thread(&MainMCU::Server::handle, this);
     }
     catch (const std::exception& error)
     {
@@ -44,6 +42,7 @@ void MainMCU::Server::stop(void)
     this->m_keepRunning = false;
     General::Connection::closeSocket(this->m_mainSocket);
     General::Connection::closeSocket(this->m_clientSocket);
+    if (this->m_mainThread.joinable()) this->m_mainThread.join();
 }
 
 void MainMCU::Server::handle(void)
