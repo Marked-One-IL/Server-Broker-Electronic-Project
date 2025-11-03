@@ -9,10 +9,10 @@ set(CMAKE_CXX_EXTENSIONS OFF) # Prevent of using compiler specific extensions.
 
 # Source files.
 add_executable( Server-Broker main.cpp
-        Static/Server.cpp
-        Global/SensorsData.cpp
-        Global/ThreadSafeCout.hpp
-        Global/ThreadSafeCout.cpp
-)
+        MainMCU/Server.cpp
+        ClientMCU/Server.cpp
+        General/SensorsData.cpp
+        General/ThreadSafeCout.cpp
+        General/Connection.cpp)
 
 target_link_libraries(Server-Broker PRIVATE ws2_32) # Link 'ws2_32'.

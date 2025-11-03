@@ -3,7 +3,7 @@
 #include <mutex>
 #include <sstream>
 
-namespace Global
+namespace General
 {
     class ThreadSafeCout
     {
@@ -24,8 +24,9 @@ namespace Global
 }
 
 template <typename Type>
-Global::ThreadSafeCout& Global::ThreadSafeCout::operator << (const Type& value)
+General::ThreadSafeCout& General::ThreadSafeCout::operator << (const Type& value)
 {
+    std::lock_guard<std::mutex> lock(General::ThreadSafeCout::m_mutex);
     this->m_buffer << value;
     return *this;
 }
