@@ -1,7 +1,6 @@
 #include "../General/Connection.hpp"
-#include "../General/Assert.hpp"
 #include <stdexcept>
-#include <cstring>
+#include <string_view>
 
 static General::Connection init;
 
@@ -41,9 +40,6 @@ void General::Connection::closeSocket(SOCKET& self)
 
 void General::Connection::receiveData(SOCKET self, void* buffer, int size)
 {
-    Assert_Message(size > 0, "Invalid size");
-
-    // MSG_WAITALL is not used because it's very supported and documented.
     int received = 0;
     for (int totalReceived = 0; totalReceived < size; totalReceived += received) 
     {
@@ -51,15 +47,28 @@ void General::Connection::receiveData(SOCKET self, void* buffer, int size)
         if (SOCKET_ERROR == received or 0 == received) throw std::runtime_error("Client disconnected");
     }
 }
-void General::Connection::sendData(SOCKET self, void* buffer, int size)
+void General::Connection::receiveHttp(SOCKET self, std::string& buffer, int maxSize)
 {
-    Assert_Message(size > 0, "Invalid size");
+    int received = 0, totalReceived = 0;
+    buffer.resize(maxSize + 1);
 
-    // MSG_WAITALL is not used because it's very supported and documented.
+    for (totalReceived = 0; totalReceived < maxSize; totalReceived += received)
+    {
+        received = recv(self, static_cast<char*>(buffer.data()) + totalReceived, maxSize - totalReceived, 0);
+        if (SOCKET_ERROR == received or 0 == received) throw std::runtime_error("Client disconnected");
+
+        buffer[totalReceived + received] = '\0';
+        if (buffer.find("\r\n\r\n") != std::string::npos) break;
+    }
+
+    buffer.resize(totalReceived);
+}
+void General::Connection::sendData(SOCKET self, const void* buffer, int size)
+{
     int sent = 0;
     for (int totalSent = 0; totalSent < size; totalSent += sent) 
     {
-        sent = send(self, static_cast<char*>(buffer) + totalSent, size - totalSent, 0);
+        sent = send(self, static_cast<const char*>(buffer) + totalSent, size - totalSent, 0);
         if (SOCKET_ERROR == sent or 0 == sent) throw std::runtime_error("Client disconnected");
     }
 }

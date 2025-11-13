@@ -78,6 +78,20 @@ void ClientMCU::Server::addClient(SOCKET clientSocket)
     std::lock_guard<std::mutex> lock(this->m_clientsMutex);
     this->m_clients.emplace_back(clientSocket, std::thread(&ClientMCU::Server::handle, this, clientSocket));
 }
+void ClientMCU::Server::freeFinishedThreads(void)
+{
+    while (this->m_keepRunning)
+    {
+        // The lock must be here and not at the start because other functions will get into starvation mode.
+        std::lock_guard<std::mutex> lock(this->m_clientsMutex);
+        for (auto it = this->m_clients.begin(); it != this->m_clients.end();)
+        {
+            if (not it->second.joinable()) it = this->m_clients.erase(it);
+            else ++it;
+        }
+    }
+}
+
 void ClientMCU::Server::handle(SOCKET socket)
 {
     try
@@ -99,19 +113,6 @@ void ClientMCU::Server::handle(SOCKET socket)
         if (this->m_keepRunning)
         {
             LOG_WARNING(error.what());
-        }
-    }
-}
-void ClientMCU::Server::freeFinishedThreads(void)
-{
-    while (this->m_keepRunning)
-    {
-        // The lock must be here and not at the start because other functions will get into starvation mode.
-        std::lock_guard<std::mutex> lock(this->m_clientsMutex);
-        for (auto it = this->m_clients.begin(); it != this->m_clients.end();)
-        {
-            if (!it->second.joinable()) it = this->m_clients.erase(it);
-            else ++it;
         }
     }
 }

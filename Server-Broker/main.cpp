@@ -1,6 +1,7 @@
 #include <iostream>
 #include "MainMCU/Server.hpp"
 #include "ClientMCU/Server.hpp"
+#include "ClientHttp/Server.hpp"
 #include "General/ThreadSafeCout.hpp"
 
 int main(int argc, char** argv)
@@ -23,14 +24,21 @@ int main(int argc, char** argv)
             */
             MainMCU::Server mainMCU(4600);
             ClientMCU::Server clientMCU(4601);
+            // Location will be fixed later.
+            ClientHttp::Server clientHttp("../../../ClientHttp/index.html");
 
             General::SensorsData tempSensorsData;
             while (mainMCU.getServerStatus() and clientMCU.getServerStatus())
             {
                 General::SensorsData sensorsData = mainMCU.getSensorsData();
-                clientMCU.setSensorsData(sensorsData);
 
-                if (sensorsData != tempSensorsData) General::cout << sensorsData << General::endl; // Avoid printing the same message (Less bloated and easy to debug).
+                if (sensorsData != tempSensorsData)
+                {
+                    clientMCU.setSensorsData(sensorsData);
+                    clientHttp.setSensorsData(sensorsData);
+                    General::cout << sensorsData << General::endl; // Avoid printing the same message (Less bloated and easy to debug).
+                }
+
                 tempSensorsData = sensorsData;
             }
         }

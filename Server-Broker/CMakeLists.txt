@@ -13,6 +13,6 @@ add_executable( Server-Broker main.cpp
         ClientMCU/Server.cpp
         General/SensorsData.cpp
         General/ThreadSafeCout.cpp
-        General/Connection.cpp)
+        General/Connection.cpp "ClientHttp/Server.cpp" "General/Helper.cpp")
 
 target_link_libraries(Server-Broker PRIVATE ws2_32) # Link 'ws2_32'.

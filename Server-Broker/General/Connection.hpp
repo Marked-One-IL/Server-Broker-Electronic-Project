@@ -1,5 +1,6 @@
 #include <WinSock2.h>
 #include <Windows.h>
+#include <string>
 
 #define LOG_INFO(message) General::cout << "[INFO] " << message << General::endl
 #define LOG_ERROR(message) General::cout << "[ERROR] " << message << General::endl
@@ -22,6 +23,7 @@ namespace General
 
 		// Send/Recv.
 		static void receiveData(SOCKET self, void* buffer, int size);
-		static void sendData(SOCKET self, void* buffer, int size);
+		static void receiveHttp(SOCKET self, std::string& buffer, int maxSize);
+		static void sendData(SOCKET self, const void* buffer, int size);
 	};
 }
