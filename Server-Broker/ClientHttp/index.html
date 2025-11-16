@@ -2,45 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Values</title>
     <style>
         body {{
-                font-family: "Segoe UI", sans-serif;
-                background: url('https://about.oceanstatejoblot.com/wp-content/uploads/2024/02/SF_HowDoGreenhousesWork_Hero.webp') no-repeat center center fixed;
-                background-size: cover;
-                color: #fff;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-            }}
+            font-family: "Segoe UI", sans-serif;
+            background: url('https://about.oceanstatejoblot.com/wp-content/uploads/2024/02/SF_HowDoGreenhousesWork_Hero.webp') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            margin: 0;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }}
+
         h1 {{
-            font-size: 2.2rem;
+            font-size: clamp(1.5rem, 6vw, 2.2rem);
             margin-bottom: 1.5rem;
+            text-align: center;
             color: #58a6ff;
         }}
+
         .sensor {{
             background: rgba(0, 0, 0, 0.6);
             border-radius: 12px;
-            padding: 1rem 2rem;
-            width: 280px;
+            padding: 1rem;
+            width: 90%;
+            max-width: 320px;
             text-align: center;
-            margin: 0.5rem 0;
-            font-size: 1.1rem;
+            margin: 0.6rem 0;
+            font-size: clamp(1rem, 4vw, 1.2rem);
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             transition: transform 0.2s ease, background 0.2s ease;
         }}
+
         .sensor:hover {{
             transform: scale(1.03);
             background: rgba(0,0,0,0.7);
         }}
+
         footer {{
             margin-top: 2rem;
-            font-size: 0.9rem;
+            font-size: clamp(0.75rem, 3vw, 1rem);
             color: #ccc;
+            text-align: center;
         }}
     </style>
 </head>
