@@ -83,6 +83,7 @@ void ClientMCU::Server::freeFinishedThreads(void)
     while (this->m_keepRunning)
     {
         // The lock must be here and not at the start because other functions will get into starvation mode.
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         std::lock_guard<std::mutex> lock(this->m_clientsMutex);
         for (auto it = this->m_clients.begin(); it != this->m_clients.end();)
         {
@@ -105,6 +106,8 @@ void ClientMCU::Server::handle(SOCKET socket)
             // Set.
             General::SensorsData::serialize(tempSensorsData, buffer);
             General::Connection::sendData(socket, buffer, sizeof(buffer));
+
+            std::this_thread::sleep_for(std::chrono::seconds(3));
         }
     }
     catch (const std::exception& error)

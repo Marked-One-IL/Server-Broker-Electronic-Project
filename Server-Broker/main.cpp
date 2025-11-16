@@ -37,9 +37,10 @@ int main(int argc, char** argv)
                     clientMCU.setSensorsData(sensorsData);
                     clientHttp.setSensorsData(sensorsData);
                     General::cout << sensorsData << General::endl; // Avoid printing the same message (Less bloated and easy to debug).
+                    tempSensorsData = sensorsData;
                 }
-
-                tempSensorsData = sensorsData;
+                
+                std::this_thread::sleep_for(std::chrono::seconds(3));
             }
         }
         catch (const std::exception& error)

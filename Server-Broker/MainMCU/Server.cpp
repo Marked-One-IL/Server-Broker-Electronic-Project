@@ -58,6 +58,8 @@ void MainMCU::Server::handle(void)
             // Set.
             General::SensorsData tempSensorsData = General::SensorsData::deserialize(buffer);
             this->setSensorsData(tempSensorsData);
+
+            std::this_thread::sleep_for(std::chrono::seconds(3));
         }
     }
     catch (const std::exception& error)

@@ -28,6 +28,8 @@ void ClientHttp::Server::handle(SOCKET socket)
                 std::make_format_args(sensorsData.temperature, sensorsData.moisture, sensorsData.soilMoisture));
 
             General::Connection::sendData(socket, html.c_str(), html.size());
+
+            std::this_thread::sleep_for(std::chrono::seconds(3));
         }
     }
     catch (const std::exception& error)
