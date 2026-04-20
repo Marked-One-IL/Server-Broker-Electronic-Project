@@ -1,5 +1,8 @@
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 #include <WinSock2.h>
-#include <Windows.h>
+#include <ws2tcpip.h>
 #include <string>
 
 #define LOG_INFO(message) General::cout << "[INFO] " << message << General::endl

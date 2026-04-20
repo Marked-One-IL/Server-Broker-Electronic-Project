@@ -1,8 +1,9 @@
 #include <iostream>
-#include "MainMCU/Server.hpp"
-#include "ClientMCU/Server.hpp"
-#include "ClientHttp/Server.hpp"
-#include "General/ThreadSafeCout.hpp"
+#include <filesystem>
+#include <MainMCU/Server.hpp>
+#include <ClientMCU/Server.hpp>
+#include <ClientHttp/Server.hpp>
+#include <General/ThreadSafeCout.hpp>
 
 int main(int argc, char** argv)
 {
@@ -24,8 +25,9 @@ int main(int argc, char** argv)
             */
             MainMCU::Server mainMCU(4600);
             ClientMCU::Server clientMCU(4601);
-            // Location will be fixed later.
-            ClientHttp::Server clientHttp("../../../ClientHttp/index.html");
+
+            std::string htmlPath = (std::filesystem::path(CMAKE_PROJECT_ROOT) / "html" / "index.html").string();
+            ClientHttp::Server clientHttp(htmlPath.c_str());
 
             General::SensorsData tempSensorsData;
             while (mainMCU.getServerStatus() and clientMCU.getServerStatus())

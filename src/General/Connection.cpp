@@ -1,4 +1,4 @@
-#include "../General/Connection.hpp"
+#include <General/Connection.hpp>
 #include <stdexcept>
 #include <string_view>
 

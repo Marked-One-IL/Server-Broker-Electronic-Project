@@ -1,4 +1,4 @@
-#include "../General/ThreadSafeCout.hpp"
+#include <General/ThreadSafeCout.hpp>
 
 std::mutex General::ThreadSafeCout::m_mutex;
 

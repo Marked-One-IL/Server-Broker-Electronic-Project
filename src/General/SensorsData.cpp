@@ -1,4 +1,4 @@
-#include "../General/SensorsData.hpp"
+#include <General/SensorsData.hpp>
 #include <cstring>
 #include <cmath>
 
@@ -39,13 +39,16 @@ bool General::SensorsData::operator != (const SensorsData& other) const
            (std::fabs(this->moisture - other.moisture)         > EPSILON) or
            (std::fabs(this->soilMoisture - other.soilMoisture) > EPSILON);
 }
-std::ostream& General::operator << (std::ostream& stream, const SensorsData& sensorsData)
+namespace General
 {
-    stream << "Temperature: "   << sensorsData.temperature  << std::endl; 
-    stream << "Moisture: "      << sensorsData.moisture     << std::endl;
-    stream << "Soil Moisture: " << sensorsData.soilMoisture << std::endl;
+    std::ostream& operator << (std::ostream& stream, const SensorsData& sensorsData)
+    {
+        stream << "Temperature: " << sensorsData.temperature << std::endl;
+        stream << "Moisture: " << sensorsData.moisture << std::endl;
+        stream << "Soil Moisture: " << sensorsData.soilMoisture << std::endl;
 
-    return stream;
+        return stream;
+    }
 }
 
 UINT32 General::SensorsData::floatToNetwork(float value)

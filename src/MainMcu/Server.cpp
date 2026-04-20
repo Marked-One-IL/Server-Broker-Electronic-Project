@@ -1,6 +1,6 @@
-#include "../MainMCU/Server.hpp"
-#include "../General/ThreadSafeCout.hpp"
-#include "../General/Connection.hpp"
+#include <MainMCU/Server.hpp>
+#include <General/ThreadSafeCout.hpp>
+#include <General/Connection.hpp>
 #include <stdexcept>
 
 MainMCU::Server::Server(unsigned short port)

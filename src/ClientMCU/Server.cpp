@@ -1,6 +1,6 @@
-#include "../ClientMCU/Server.hpp"
-#include "../General/Connection.hpp"
-#include "../General/ThreadSafeCout.hpp"
+#include <ClientMCU/Server.hpp>
+#include <General/Connection.hpp>
+#include <General/ThreadSafeCout.hpp>
 #include <algorithm>
 
 ClientMCU::Server::Server(unsigned short port)

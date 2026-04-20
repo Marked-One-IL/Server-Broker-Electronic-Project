@@ -1,12 +1,12 @@
-#include "../ClientHttp/Server.hpp"
-#include "../General/Connection.hpp"
-#include "../General/ThreadSafeCout.hpp"
-#include "../General/Helper.hpp"
+#include <ClientHttp/Server.hpp>
+#include <General/Connection.hpp>
+#include <General/ThreadSafeCout.hpp>
+#include <General/Helper.hpp>
 #include <format>
 #include <sstream>
 
 ClientHttp::Server::Server(const char* htmlFilename) :
-	ClientMCU::Server(80)
+	ClientMCU::Server(ClientHttp::Server::HTTP_PORT)
 {
     if (auto opt = General::Helper::extractFileContent(htmlFilename)) this->m_htmlContent = opt.value();
     else throw std::runtime_error("Could not load html file");
@@ -27,7 +27,7 @@ void ClientHttp::Server::handle(SOCKET socket)
                 this->m_htmlContent,
                 std::make_format_args(sensorsData.temperature, sensorsData.moisture, sensorsData.soilMoisture));
 
-            General::Connection::sendData(socket, html.c_str(), html.size());
+            General::Connection::sendData(socket, html.c_str(), static_cast<int>(html.size()));
 
             std::this_thread::sleep_for(std::chrono::seconds(3));
         }

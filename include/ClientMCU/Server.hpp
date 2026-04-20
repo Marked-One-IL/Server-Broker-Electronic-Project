@@ -1,7 +1,6 @@
 #pragma once
-#include "../General/SensorsData.hpp"
+#include <General/SensorsData.hpp>
 #include <WinSock2.h>
-#include <Windows.h>
 #include <vector>
 #include <thread>
 #include <atomic>

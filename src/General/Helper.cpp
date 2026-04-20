@@ -1,4 +1,4 @@
-#include "../General/Helper.hpp"
+#include <General/Helper.hpp>
 #include <fstream>
 
 std::optional<std::string> General::Helper::extractFileContent(const char* filename)

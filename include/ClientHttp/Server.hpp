@@ -1,4 +1,4 @@
-#include "../ClientMCU/Server.hpp"
+#include <ClientMCU/Server.hpp>
 
 namespace ClientHttp
 {
@@ -10,5 +10,7 @@ namespace ClientHttp
 	private:
 		virtual void handle(SOCKET socket) override;
 		std::string m_htmlContent;
+
+		static constexpr unsigned short HTTP_PORT = 80;
 	};
 }
