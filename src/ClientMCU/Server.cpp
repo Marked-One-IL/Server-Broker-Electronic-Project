@@ -101,7 +101,7 @@ void ClientMCU::Server::handle(SOCKET socket)
         while (this->m_keepRunning)
         {
             // Get.
-            uint32_t buffer[4];
+            uint32_t buffer[General::SensorsData::SIZE_AS_ARRAY];
             General::SensorsData tempSensorsData = this->getSensorsData();
 
             // Set.

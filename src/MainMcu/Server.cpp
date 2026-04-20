@@ -53,7 +53,7 @@ void MainMCU::Server::handle(void)
         while (this->m_keepRunning)
         {
             // Get.
-            uint32_t buffer[4];
+            uint32_t buffer[General::SensorsData::SIZE_AS_ARRAY];
             General::Connection::receiveData(this->m_clientSocket, buffer, sizeof(buffer));
 
             // Set.

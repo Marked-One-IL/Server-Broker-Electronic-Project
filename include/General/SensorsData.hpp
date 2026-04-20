@@ -20,6 +20,8 @@ namespace General
         float soilMoisture = 0.0f;
         float light = 0.0f;
 
+        inline static constexpr size_t SIZE_AS_ARRAY = (sizeof(float) * 4) / sizeof(float);
+
     private:
         // Casting.
         static uint32_t floatToNetwork(float value);
