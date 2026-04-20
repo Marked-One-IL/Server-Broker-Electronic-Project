@@ -1,5 +1,6 @@
 #include <ClientMCU/Server.hpp>
 #include <General/Connection.hpp>
+#include <General/Helper.hpp>
 #include <General/ThreadSafeCout.hpp>
 #include <algorithm>
 
@@ -17,7 +18,7 @@ ClientMCU::Server::Server(unsigned short port)
     catch (const std::exception& error)
     {
         this->stop();
-        LOG_ERROR(error.what());
+        General::Helper::logWarning(error.what());
     }
 }
 ClientMCU::Server::~Server(void)
@@ -69,7 +70,7 @@ void ClientMCU::Server::acceptClients(void)
         // If server is closing some methods from General::Connection may and probably will throw.
         if (this->m_keepRunning)
         {
-            LOG_WARNING(error.what());
+            General::Helper::logWarning(error.what());
         }
     }
 }
@@ -83,7 +84,7 @@ void ClientMCU::Server::freeFinishedThreads(void)
     while (this->m_keepRunning)
     {
         // The lock must be here and not at the start because other functions will get into starvation mode.
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::this_thread::sleep_for(std::chrono::seconds(General::Helper::SLEEP_TIME));
         std::lock_guard<std::mutex> lock(this->m_clientsMutex);
         for (auto it = this->m_clients.begin(); it != this->m_clients.end();)
         {
@@ -100,14 +101,14 @@ void ClientMCU::Server::handle(SOCKET socket)
         while (this->m_keepRunning)
         {
             // Get.
-            UINT32 buffer[3];
+            uint32_t buffer[4];
             General::SensorsData tempSensorsData = this->getSensorsData();
 
             // Set.
             General::SensorsData::serialize(tempSensorsData, buffer);
             General::Connection::sendData(socket, buffer, sizeof(buffer));
 
-            std::this_thread::sleep_for(std::chrono::seconds(3));
+            std::this_thread::sleep_for(std::chrono::seconds(General::Helper::SLEEP_TIME));
         }
     }
     catch (const std::exception& error)
@@ -115,7 +116,7 @@ void ClientMCU::Server::handle(SOCKET socket)
         // If server is closing some methods from General::Connection may and probably will throw.
         if (this->m_keepRunning)
         {
-            LOG_WARNING(error.what());
+            General::Helper::logWarning(error.what());
         }
     }
 }

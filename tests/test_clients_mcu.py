@@ -14,12 +14,14 @@ def client_thread(client_id):
             print(f"[Client {client_id}] Connected")
 
             while True:
-                data = sock.recv(12)
-                if len(data) != 12:
+                # Increased to 16 bytes to accommodate 4 floats
+                data = sock.recv(16) 
+                if len(data) != 16:
                     break
 
-                temperature, moisture, soil_moisture = struct.unpack('!fff', data)
-                print(f"[Client {client_id}] Temp={temperature:.2f}, Moisture={moisture:.2f}, Soil={soil_moisture:.2f}")
+                # Added light to the unpack format ('!ffff')
+                temperature, moisture, soil_moisture, light = struct.unpack('!ffff', data)
+                print(f"[Client {client_id}] Temp={temperature:.2f}, Moisture={moisture:.2f}, Soil={soil_moisture:.2f}, Light={light:.2f}")
 
                 # Wait ~3 seconds before next packet
                 time.sleep(3)

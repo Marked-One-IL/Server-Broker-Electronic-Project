@@ -1,6 +1,7 @@
 #include <MainMCU/Server.hpp>
 #include <General/ThreadSafeCout.hpp>
 #include <General/Connection.hpp>
+#include <General/Helper.hpp>
 #include <stdexcept>
 
 MainMCU::Server::Server(unsigned short port)
@@ -20,12 +21,12 @@ MainMCU::Server::Server(unsigned short port)
     catch (const std::exception& error)
     {
         this->stop();
-        LOG_ERROR(error.what());
+        General::Helper::logWarning(error.what());
     }
 }
 MainMCU::Server::~Server(void)
 {
-    stop(); // To make sure.
+    this->stop(); // To make sure.
 }
 
 bool MainMCU::Server::getServerStatus(void) const
@@ -52,14 +53,14 @@ void MainMCU::Server::handle(void)
         while (this->m_keepRunning)
         {
             // Get.
-            UINT32 buffer[3];
+            uint32_t buffer[4];
             General::Connection::receiveData(this->m_clientSocket, buffer, sizeof(buffer));
 
             // Set.
             General::SensorsData tempSensorsData = General::SensorsData::deserialize(buffer);
             this->setSensorsData(tempSensorsData);
 
-            std::this_thread::sleep_for(std::chrono::seconds(3));
+            std::this_thread::sleep_for(std::chrono::seconds(General::Helper::SLEEP_TIME));
         }
     }
     catch (const std::exception& error)
@@ -68,7 +69,7 @@ void MainMCU::Server::handle(void)
         if (this->m_keepRunning)
         {
             this->m_keepRunning = false;
-            LOG_ERROR(error.what());
+            General::Helper::logWarning(error.what());
         }
     }
 }

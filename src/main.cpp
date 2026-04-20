@@ -3,6 +3,7 @@
 #include <MainMCU/Server.hpp>
 #include <ClientMCU/Server.hpp>
 #include <ClientHttp/Server.hpp>
+#include <General/Helper.hpp>
 #include <General/ThreadSafeCout.hpp>
 
 int main(int argc, char** argv)
@@ -38,16 +39,17 @@ int main(int argc, char** argv)
                 {
                     clientMCU.setSensorsData(sensorsData);
                     clientHttp.setSensorsData(sensorsData);
-                    General::cout << sensorsData << General::endl; // Avoid printing the same message (Less bloated and easy to debug).
+
+                    General::Helper::logInfo(sensorsData); // Avoid printing the same message (Less bloated and easy to debug).
                     tempSensorsData = sensorsData;
                 }
                 
-                std::this_thread::sleep_for(std::chrono::seconds(3));
+                std::this_thread::sleep_for(std::chrono::seconds(General::Helper::SLEEP_TIME));
             }
         }
         catch (const std::exception& error)
         {
-            std::cout << error.what() << std::endl;
+            std::cout << error.what() << '\n';
         }
     }
 

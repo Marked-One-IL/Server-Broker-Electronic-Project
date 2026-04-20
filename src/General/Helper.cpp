@@ -8,5 +8,4 @@ std::optional<std::string> General::Helper::extractFileContent(const char* filen
 
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	return content;
-
 }

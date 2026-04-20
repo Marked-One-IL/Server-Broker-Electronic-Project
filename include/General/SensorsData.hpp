@@ -1,14 +1,13 @@
 #pragma once
 #include <ostream>
 #include <WinSock2.h>
-#include <Windows.h>
+#include <cstdint>
 
 namespace General
 {
     struct SensorsData
     {
         SensorsData(void) = default;
-        SensorsData(float new_temperature, float new_moisture, float new_soilMoisture);
 
         static General::SensorsData deserialize(const void* buffer);
         static void serialize(const General::SensorsData& sensorsData, void* buffer);
@@ -19,10 +18,11 @@ namespace General
         float temperature = 0.0f;
         float moisture = 0.0f;
         float soilMoisture = 0.0f;
+        float light = 0.0f;
 
     private:
         // Casting.
-        static UINT32 floatToNetwork(float value);
-        static float networkToFloat(UINT32 value);
+        static uint32_t floatToNetwork(float value);
+        static float networkToFloat(uint32_t value);
     };
 }

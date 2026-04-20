@@ -1,13 +1,6 @@
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
 #include <WinSock2.h>
 #include <ws2tcpip.h>
 #include <string>
-
-#define LOG_INFO(message) General::cout << "[INFO] " << message << General::endl
-#define LOG_ERROR(message) General::cout << "[ERROR] " << message << General::endl
-#define LOG_WARNING(message) General::cout << "[WARNING] " << message << General::endl
 
 namespace General
 {

@@ -16,11 +16,12 @@ class MainMCUClient:
         self.sock.connect((self.host, self.port))
         print(f"[+] Connected to {self.host}:{self.port}")
 
-    def send_sensor_data(self, temperature, moisture, soil_moisture):
+    def send_sensor_data(self, temperature, moisture, soil_moisture, light):
         """Send sensor data as big-endian floats (matches C++ htonl logic)"""
-        data = struct.pack('!fff', temperature, moisture, soil_moisture)
+        # Updated to 4 floats ('!ffff')
+        data = struct.pack('!ffff', temperature, moisture, soil_moisture, light)
         print(f"[>] Sending: {data.hex()} | "
-              f"Temp={temperature:.2f}, Moisture={moisture:.2f}, Soil={soil_moisture:.2f}")
+              f"Temp={temperature:.2f}, Moisture={moisture:.2f}, Soil={soil_moisture:.2f}, Light={light:.2f}")
         self.sock.sendall(data)
 
     def disconnect(self):
@@ -40,8 +41,10 @@ def run_forever():
             temp = 20.0 + random.uniform(-5.0, 10.0)
             moisture = 50.0 + random.uniform(-20.0, 30.0)
             soil_moisture = 40.0 + random.uniform(-15.0, 25.0)
+            # Added random light value
+            light = random.uniform(0.0, 1000.0)
 
-            client.send_sensor_data(temp, moisture, soil_moisture)
+            client.send_sensor_data(temp, moisture, soil_moisture, light)
             time.sleep(3)  # Consistent 3-second sleep
 
     except Exception as e:

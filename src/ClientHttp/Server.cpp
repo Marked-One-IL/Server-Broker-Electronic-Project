@@ -25,11 +25,11 @@ void ClientHttp::Server::handle(SOCKET socket)
 
             std::string html = std::vformat(
                 this->m_htmlContent,
-                std::make_format_args(sensorsData.temperature, sensorsData.moisture, sensorsData.soilMoisture));
+                std::make_format_args(sensorsData.temperature, sensorsData.moisture, sensorsData.soilMoisture, sensorsData.light));
 
             General::Connection::sendData(socket, html.c_str(), static_cast<int>(html.size()));
 
-            std::this_thread::sleep_for(std::chrono::seconds(3));
+            std::this_thread::sleep_for(std::chrono::seconds(General::Helper::SLEEP_TIME));
         }
     }
     catch (const std::exception& error)
@@ -37,7 +37,7 @@ void ClientHttp::Server::handle(SOCKET socket)
         // If server is closing some methods from General::Connection may and probably will throw.
         if (this->m_keepRunning)
         {
-            LOG_WARNING(error.what());
+            General::Helper::logWarning(error.what());
         }
     }
 }
